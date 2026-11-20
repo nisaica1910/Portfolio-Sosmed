@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ p.name }} | {{ p.role[0] }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="nav">
+  <a class="logo" href="#top">{{ p.handle }}</a>
+  <nav>
+    <a class="hide-sm" href="#tentang">{{ t.n_about|bi }}</a>
+    <a class="hide-sm" href="#karya">{{ t.n_work|bi }}</a>
+    <a class="hide-sm" href="#dokumentasi">{{ t.n_ach|bi }}</a>
+    <a class="hide-sm" href="#pengalaman">{{ t.n_exp|bi }}</a>
+    <button class="lang" id="lang" aria-label="Ganti bahasa / Switch language">
+      <span data-l="id">ID</span><span data-l="en">EN</span>
+    </button>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="role">{{ p.role|bi }}</p>
+      <h1>{{ p.name }}</h1>
+      <p class="tagline">{{ p.tagline|bi }}</p>
+      <div class="cta">
+        <a class="btn" href="#karya">{{ t.cta1|bi }}</a>
+        <a class="btn alt" href="#dokumentasi">{{ t.cta2|bi }}</a>
+      </div>
+    </div>
+    <div class="portrait" aria-hidden="true">
+      <div class="arch"><img src="{{ url_for('static', filename='img/foto.jpg') }}" alt="" onerror="this.remove()"></div>
+      <span class="sticker s1">Editor</span>
+      <span class="sticker s2">Content Creator</span>
+      <span class="sticker s3">MC</span>
+    </div>
+  </section>
+
+  <section id="tentang" class="section about">
+    <h2>{{ t.about_h|bi }}</h2>
+    <p class="lead">{{ p.about|bi }}</p>
+    <p class="tools"><b>{{ t.tools|bi }}:</b> {% for x in p.tools %}<span class="pill">{{ x }}</span>{% endfor %}</p>
+  </section>
+
+  <section id="karya" class="section work">
+    <div class="head">
+      <h2>{{ t.work_h|bi }}</h2>
+    </div>
+    <p class="sub">{{ t.work_s|bi }}</p>
+    <div class="grid">
+      {% for c in contents %}
+      <a class="card {{ c.c }}" href="{{ c.url }}" target="_blank" rel="noopener" data-cat="{{ c.cat }}">
+        <img src="{{ url_for('static', filename='img/' ~ c.thumb) }}" alt="{{ c.title[0] }}" loading="lazy" onerror="this.remove()">
+        <span class="play" aria-hidden="true">&#9654;</span>
+        <span class="info"><strong>{{ c.title|bi }}</strong><em>{{ t.watch|bi }}</em></span>
+      </a>
+      {% endfor %}
+    </div>
+        <div class="more-wrap">
+      <button id="more" class="more" aria-expanded="false" hidden>
+        <span class="lbl-more">{{ t.more|bi }}</span>
+        <span class="lbl-less">{{ t.less|bi }}</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="youtube" class="section yt">
+    <h2>{{ t.yt_h|bi }}</h2>
+    <p class="sub">{{ t.yt_s|bi }}</p>
+    <div class="yt-grid">
+      {% for v in youtube %}
+      <a class="yt-card" href="https://www.youtube.com/watch?v={{ v.id }}" target="_blank" rel="noopener">
+        {% if v.thumb %}
+        <img src="{{ url_for('static', filename='img/' ~ v.thumb) }}" alt="{{ v.title[0] }}" loading="lazy" onerror="this.remove()">
+        {% else %}
+        <img src="https://img.youtube.com/vi/{{ v.id }}/hqdefault.jpg" alt="{{ v.title[0] }}" loading="lazy" onerror="this.remove()">
+        {% endif %}
+        <span class="badge">{{ v.tools }}</span>
+        <span class="play" aria-hidden="true">&#9654;</span>
+        <span class="info"><strong>{{ v.title|bi }}</strong><em>{{ t.watch|bi }}</em></span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="dokumentasi" class="section docs">
+    <h2>{{ t.doc_h|bi }}</h2>
+    <p class="sub">{{ t.doc_s|bi }}</p>
+    {% for d in docs %}
+    <div class="doc-group">
+      <h3>{{ d.title|bi }}</h3>
+      <p>{{ d.desc|bi }}</p>
+      <div class="photos">
+        {% for ph in d.photos %}
+          <figure class="photo {{ d.c }}{% if ph.wide %} wide{% endif %}">
+          <img src="{{ url_for('static', filename='img/' ~ ph.file) }}" alt="{{ ph.cap[0] }}" loading="lazy" onerror="this.remove()">
+          <figcaption>{{ ph.cap|bi }}</figcaption>
+        </figure>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section id="pengalaman" class="section exp">
+    <h2>{{ t.exp_h|bi }}</h2>
+    <div class="roles">
+      {% for r in roles %}<div class="role-card r{{ loop.index }}"><h3>{{ r.title|bi }}</h3><p>{{ r.desc|bi }}</p></div>{% endfor %}
+    </div>
+    <ol class="timeline">
+            {% for e in exps %}
+      <li>
+        <div class="tl-body">
+          <span class="period">{{ e.period }}</span>
+          <h3>{{ e.title|bi }}</h3>
+          <small>{% if e.place is string %}{{ e.place }}{% else %}{{ e.place|bi }}{% endif %}</small>
+          <p>{{ e.desc|bi }}</p>
+        </div>
+        {% if e.ig %}
+        <a class="ig-link" href="{{ e.ig.url }}" target="_blank" rel="noopener" aria-label="Instagram {{ e.ig.handle }}">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>{{ e.ig.handle }}</span>
+        </a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <section id="kontak" class="section contact">
+    <h2>{{ t.contact_h|bi }}</h2>
+    <p class="sub">{{ t.contact_s|bi }}</p>
+        <div class="contact-btns">
+      <a class="btn" href="mailto:{{ p.email }}">{{ t.email_btn|bi }}</a>
+      <a class="btn wa id" href="https://wa.me/{{ p.whatsapp }}?text={{ t.wa_msg[0]|urlencode }}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.7-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
+        {{ t.wa_btn[0] }}
+      </a>
+      <a class="btn wa en" href="https://wa.me/{{ p.whatsapp }}?text={{ t.wa_msg[1]|urlencode }}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.7-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
+        {{ t.wa_btn[1] }}
+      </a>
+    </div>
+    <div class="socials">{% for s in p.socials %}<a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a>{% endfor %}</div>
+  </section>
+</main>
+
+<footer>&copy; {{ p.name }}</footer>
+<a href="#top" id="totop" class="totop" aria-label="Kembali ke atas / Back to top">&#8593;</a>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
